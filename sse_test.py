@@ -38,7 +38,7 @@ subscriptions = []
 # Client code consumes like this.
 @app.route("/")
 def index():
-    debug_template = """
+    event_receiver_page = """
     <html>
       <head>
         <style>
@@ -47,6 +47,10 @@ def index():
             text-shadow: 0 0 4px rgba(0,0,0,0.3);
             font-family: helvetica, sans-serif;
             text-align: center;
+            font-weight: normal;
+          }
+          h1 span#color {
+            font-family: Monaco, monospace;
           }
           body {
             background: #ccc;
@@ -54,10 +58,11 @@ def index():
           }
         </style>
       </head>
-        <body id="changeBackground">
-          <h1>Server sent background color: <span id="color"></span></h1>
-          <script type="text/javascript">
-          
+      <body id="changeBackground">
+        
+        <h1>Server sent background color: <span id="color"></span></h1>
+        
+        <script type="text/javascript">
           var evtSrc = new EventSource("/subscribe");
           
           var eventOutputContainer = document.getElementById("color");
@@ -67,13 +72,12 @@ def index():
             console.log(e.data);
             eventOutputContainer.innerHTML = e.data;
             pageBody.style.backgroundColor = e.data;
-         };
-
-         </script>
-       </body>
-     </html>
+          };
+        </script>
+      </body>
+    </html>
     """
-    return(debug_template)
+    return(event_receiver_page)
 
 @app.route("/debug")
 def debug():
