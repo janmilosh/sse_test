@@ -7,6 +7,7 @@ from gevent.wsgi import WSGIServer
 from gevent.queue import Queue
 
 from flask import Flask, Response
+from flask.ext.cors import CORS
 
 import time, random
 
@@ -33,6 +34,7 @@ class ServerSentEvent(object):
         return "%s\n\n" % "\n".join(lines)
 
 app = Flask(__name__)
+cors = CORS(app)
 subscriptions = []
 
 # Client code consumes like this.
@@ -86,16 +88,16 @@ def debug():
 @app.route("/publish")
 def publish():
     #Dummy data - pick up from request for real data
-    r = lambda: random.randint(0,255)
-    msg = ('#%02X%02X%02X' % (r(),r(),r()))
-    
+    # r = lambda: random.randint(0,255)
+    # msg = ('#%02X%02X%02X' % (r(),r(),r()))
+    msg = '{"lat": 39.9829514, "lon": -82.990829}';
     def notify():
         for sub in subscriptions[:]:
             sub.put(msg)
     
     gevent.spawn(notify)
     
-    return "New random color sent: " + msg
+    return "Data sent: " + msg
 
 @app.route("/subscribe")
 def subscribe():
