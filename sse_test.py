@@ -6,7 +6,7 @@ import gevent
 from gevent.wsgi import WSGIServer
 from gevent.queue import Queue
 
-from flask import Flask, Response
+from flask import Flask, Response, render_template
 from flask.ext.cors import CORS
 
 import time, random
@@ -97,7 +97,7 @@ def publish():
     
     gevent.spawn(notify)
     
-    return "Data sent: " + msg
+    return render_template('map.html')
 
 @app.route("/subscribe")
 def subscribe():
