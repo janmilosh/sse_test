@@ -1,7 +1,6 @@
 from flask import make_response, render_template
 from flask import redirect, session, url_for
 
-from . import main
 
 import gevent
 from gevent.wsgi import WSGIServer
