@@ -2,15 +2,17 @@
 # from: http://flask.pocoo.org/snippets/116/
 #
 # Make sure your gevent version is >= 1.0
-import gevent
-from gevent.wsgi import WSGIServer
-from gevent.queue import Queue
-
-from flask import Flask, Response, render_template
-from flask.ext.cors import CORS
 
 import time, random
 
+from flask import make_response, render_template
+from flask import redirect, session, url_for
+from flask import Flask, Response
+from flask.ext.cors import CORS
+
+import gevent
+from gevent.wsgi import WSGIServer
+from gevent.queue import Queue
 
 # SSE "protocol" is described here: http://mzl.la/UPFyxY
 class ServerSentEvent(object):
@@ -40,46 +42,13 @@ subscriptions = []
 # Client code consumes like this.
 @app.route("/")
 def index():
-    event_receiver_page = """
-    <html>
-      <head>
-        <style>
-          h1 {
-            color: white;
-            text-shadow: 0 0 4px rgba(0,0,0,0.3);
-            font-family: helvetica, sans-serif;
-            text-align: center;
-            font-weight: normal;
-          }
-          h1 span#color {
-            font-family: Monaco, monospace;
-          }
-          body {
-            background: #ccc;
-            padding: 50px;
-          }
-        </style>
-      </head>
-      <body id="changeBackground">
-        
-        <h1>Server sent background color: <span id="color"></span></h1>
-        
-        <script type="text/javascript">
-          var evtSrc = new EventSource("/subscribe");
-          
-          var eventOutputContainer = document.getElementById("color");
-          var pageBody = document.getElementById("changeBackground");
-          
-          evtSrc.onmessage = function(e) {
-            console.log(e.data);
-            eventOutputContainer.innerHTML = e.data;
-            pageBody.style.backgroundColor = e.data;
-          };
-        </script>
-      </body>
-    </html>
-    """
-    return(event_receiver_page)
+    msg = '{"lat": 39.9829514, "lon": -82.990829}';
+    def notify():
+        for sub in subscriptions[:]:
+            sub.put(msg)
+    
+    gevent.spawn(notify)
+    return render_template('index.html')
 
 @app.route("/debug")
 def debug():
