@@ -5,7 +5,7 @@ To run, create virtual environment and install requirements.
 Start server: 
 
 ```
-$ python sse_test.py
+$ python manage.py runserver --debug
 ```
 
 Open a browser window to: ```localhost:5000```

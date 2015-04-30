@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block title %}Map{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css')}}" type="text/css" />  
+  </head>
+  <body id="background">
+    {% block content %}      
+    {% endblock %}
+    <div id="usa-map">
+    </div>
+  
+    {% block scripts %}
+      <script src="map-scripts/jquery.min.js"></script>
+      <script src="map-scripts/d3.v3.min.js"></script>
+      <script src="map-scripts/map-path.js"></script>
+      <script src="map-scripts/topojson.v1.min.js"></script>
+      <script src="map-scripts/d3-map.js"></script>
+    {% endblock %}
+  </body>
+</html>

@@ -1,32 +1,65 @@
-from datetime import datetime
-
-from flask import abort, flash, make_response, request
-from flask import redirect, render_template, session, url_for
+from flask import make_response, render_template
+from flask import redirect, session, url_for
 
 from . import main
-from .forms import NameForm
-from .. import db
-from ..models import User
 
-@main.route('/', methods=['GET', 'POST'])
-def index():
-    form = NameForm()
+import gevent
+from gevent.wsgi import WSGIServer
+from gevent.queue import Queue
 
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.name.data).first()
-        if user is None:
-            user = User(username=form.name.data)
-            db.session.add(user)
-            session['known'] = False
-        else:
-            session['known'] = True
+from flask import Flask, Response, render_template
+
+subscriptions = []
+
+class ServerSentEvent(object):
+
+    def __init__(self, data):
+        self.data = data
+        self.event = None
+        self.id = None
+        self.desc_map = {
+            self.data : "data",
+            self.event : "event",
+            self.id : "id"
+        }
+
+    def encode(self):
+        if not self.data:
+            return ""
+        lines = ["%s: %s" % (v, k) 
+                 for k, v in self.desc_map.iteritems() if k]
         
-        session['name'] = form.name.data
-        form.name.data = ''
-        return redirect(url_for('.index'))
+        return "%s\n\n" % "\n".join(lines)
+
+
+
+@main.route('/')
+def publish():
+    msg = '{"lat": 39.9829514, "lon": -82.990829}';
+    def notify():
+        for sub in subscriptions[:]:
+            sub.put(msg)
     
-    return render_template('index.html',
-                            current_time=datetime.utcnow(),
-                            name=session.get('name'),
-                            form=form,
-                            known=session.get('known', False))
+    gevent.spawn(notify)
+    
+    return render_template('index.html')
+
+@main.route("/subscribe")
+def subscribe():
+    def gen():
+        q = Queue()
+        subscriptions.append(q)
+        print len(subscriptions)
+        try:
+            while True:
+                result = q.get()
+                ev = ServerSentEvent(str(result))
+                yield ev.encode()
+        except GeneratorExit:
+            subscriptions.remove(q)
+
+    return Response(gen(), mimetype="text/event-stream")
+
+@main.route("/debug")
+def debug():
+    return "Currently %d subscriptions" % len(subscriptions)
