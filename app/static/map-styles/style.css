@@ -1,0 +1,30 @@
+body#background {
+  margin: 0;
+  background-color: #7C6747;
+}
+
+#usa-map {
+  overflow: hidden;
+}
+
+svg {
+  background: none;
+}
+
+.background {
+  fill: none;
+  pointer-events: all;
+}
+
+.feature {
+  fill: #181D3D;
+}
+
+.mesh {
+  fill: none;
+  stroke: #555;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+

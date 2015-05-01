@@ -6,7 +6,7 @@ import gevent
 from gevent.wsgi import WSGIServer
 from gevent.queue import Queue
 
-from flask import Flask, Response
+from flask import Flask, Response, render_template
 from flask.ext.cors import CORS
 
 import time, random
@@ -87,17 +87,16 @@ def debug():
 
 @app.route("/publish")
 def publish():
-    #Dummy data - pick up from request for real data
-    # r = lambda: random.randint(0,255)
-    # msg = ('#%02X%02X%02X' % (r(),r(),r()))
-    msg = '{"lat": 39.9829514, "lon": -82.990829}';
+    r = lambda: random.randint(0,255)
+    msg = ('#%02X%02X%02X' % (r(),r(),r()))
+    # msg = '{"lat": 39.9829514, "lon": -82.990829}';
     def notify():
         for sub in subscriptions[:]:
             sub.put(msg)
     
     gevent.spawn(notify)
     
-    return "Data sent: " + msg
+    return render_template('index.html')
 
 @app.route("/subscribe")
 def subscribe():
