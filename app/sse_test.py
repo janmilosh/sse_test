@@ -6,10 +6,10 @@ import gevent
 from gevent.wsgi import WSGIServer
 from gevent.queue import Queue
 
-from flask import Flask, Response, render_template
+from flask import Flask, Response, render_template, request
 from flask.ext.cors import CORS
 
-import time, random
+import time, random, json, string
 
 
 # SSE "protocol" is described here: http://mzl.la/UPFyxY
@@ -85,11 +85,13 @@ def index():
 def debug():
     return "Currently %d subscriptions" % len(subscriptions)
 
-@app.route("/publish")
+@app.route("/publish", methods = ['GET', 'POST'])
 def publish():
-    r = lambda: random.randint(0,255)
-    msg = ('#%02X%02X%02X' % (r(),r(),r()))
-    # msg = '{"lat": 39.9829514, "lon": -82.990829}';
+
+    msg = str(request.json);
+    msg = string.replace(msg, '\'', '\"')
+    msg = string.replace(msg, 'u', '')
+
     def notify():
         for sub in subscriptions[:]:
             sub.put(msg)

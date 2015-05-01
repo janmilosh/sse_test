@@ -27,4 +27,8 @@ svg {
   stroke-linejoin: round;
 }
 
+.circle {
+  fill: #8A2BE2;
+}
+
 
