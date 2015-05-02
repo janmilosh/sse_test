@@ -37,56 +37,9 @@ app = Flask(__name__)
 cors = CORS(app)
 subscriptions = []
 
-# Client code consumes like this.
-@app.route("/")
-def index():
-    event_receiver_page = """
-    <html>
-      <head>
-        <style>
-          h1 {
-            color: white;
-            text-shadow: 0 0 4px rgba(0,0,0,0.3);
-            font-family: helvetica, sans-serif;
-            text-align: center;
-            font-weight: normal;
-          }
-          h1 span#color {
-            font-family: Monaco, monospace;
-          }
-          body {
-            background: #ccc;
-            padding: 50px;
-          }
-        </style>
-      </head>
-      <body id="changeBackground">
-        
-        <h1>Server sent background color: <span id="color"></span></h1>
-        
-        <script type="text/javascript">
-          var evtSrc = new EventSource("/subscribe");
-          
-          var eventOutputContainer = document.getElementById("color");
-          var pageBody = document.getElementById("changeBackground");
-          
-          evtSrc.onmessage = function(e) {
-            console.log(e.data);
-            eventOutputContainer.innerHTML = e.data;
-            pageBody.style.backgroundColor = e.data;
-          };
-        </script>
-      </body>
-    </html>
-    """
-    return(event_receiver_page)
 
-@app.route("/debug")
-def debug():
-    return "Currently %d subscriptions" % len(subscriptions)
-
-@app.route("/publish", methods = ['GET', 'POST'])
-def publish():
+@app.route("/", methods = ['GET', 'POST'])
+def send():
 
     msg = str(request.json);
     msg = string.replace(msg, '\'', '\"')
@@ -99,6 +52,11 @@ def publish():
     gevent.spawn(notify)
     
     return render_template('index.html')
+
+@app.route("/receive")
+def receive():
+    
+    return render_template('receiver-map.html')
 
 @app.route("/subscribe")
 def subscribe():
@@ -115,9 +73,13 @@ def subscribe():
 
     return Response(gen(), mimetype="text/event-stream")
 
+@app.route("/debug")
+def debug():
+    return "Currently %d subscriptions" % len(subscriptions)
+
+
 if __name__ == "__main__":
     app.debug = True
     server = WSGIServer(("", 5000), app)
     server.serve_forever()
-    # Then visit http://localhost:5000 to subscribe 
-    # and send messages by visiting http://localhost:5000/publish
+    

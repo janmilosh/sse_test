@@ -71,7 +71,7 @@ $(function() {
     // Append a new point
     circle = group.append("circle")
       .attr("transform", "translate(" + p.x + "," + p.y + ")")
-      .attr("r", "8")
+      .attr("r", "15")
       .attr("class", "circle");
 
     circle.transition()
@@ -85,7 +85,7 @@ $(function() {
     var latlonArray = projection.invert(d3.mouse(this));
 
     clickData = {"lat": latlonArray[1], "lon": latlonArray[0]}
-    var sendData = d3.xhr('/publish');
+    var sendData = d3.xhr('/');
 
     sendData.header("Content-Type", "application/json")
       .post(JSON.stringify(clickData), function(error,received) {

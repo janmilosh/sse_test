@@ -1,0 +1,34 @@
+body#background {
+  margin: 0;
+  background-color: white;
+}
+
+#usa-map {
+  overflow: hidden;
+}
+
+svg {
+  background: none;
+}
+
+.background {
+  fill: none;
+  pointer-events: all;
+}
+
+.feature {
+  fill: #ccc;
+}
+
+.mesh {
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.circle {
+  fill: limegreen;
+}
+
+

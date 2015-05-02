@@ -5,11 +5,11 @@ To run, create virtual environment and install requirements.
 Start server: 
 
 ```
-$ python sse_test.py
+$ gunicorn -b 0.0.0.0:5000 -k gevent application:app
 ```
 
 Open a browser window to: ```localhost:5000```
 
-Open another browser window to: ```localhost:5000/publish```
+Open another browser window to: ```localhost:5000/receive```
 
-Every time you refresh the publish browser, a random hex color value is sent to the other window and the background will change to that color.
+Click on the sender map and the location will appear on the receiver map.
