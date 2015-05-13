@@ -6,6 +6,7 @@ import gevent
 from gevent.wsgi import WSGIServer
 from gevent.queue import Queue
 
+from flask_debugtoolbar import DebugToolbarExtension
 from flask import Flask, Response, render_template, request
 from flask.ext.cors import CORS
 
@@ -34,6 +35,11 @@ class ServerSentEvent(object):
         return "%s\n\n" % "\n".join(lines)
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'hereisasecretkey'
+
+app.debug = True
+toolbar = DebugToolbarExtension(app)
+
 cors = CORS(app)
 subscriptions = []
 
@@ -79,7 +85,7 @@ def debug():
 
 
 if __name__ == "__main__":
-    app.debug = True
+
     server = WSGIServer(("", 5000), app)
     server.serve_forever()
     
