@@ -10,6 +10,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask import Flask, Response, render_template, request
 from flask.ext.cors import CORS
 
+from config import BaseConfig
+
 import time, random, json, string
 
 
@@ -35,7 +37,8 @@ class ServerSentEvent(object):
         return "%s\n\n" % "\n".join(lines)
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'hereisasecretkey'
+
+app.config.from_object(BaseConfig)
 
 app.debug = True
 toolbar = DebugToolbarExtension(app)
@@ -74,7 +77,7 @@ def subscribe():
                 result = q.get()
                 ev = ServerSentEvent(str(result))
                 yield ev.encode()
-        except GeneratorExit: # Or maybe use flask signals
+        except GeneratorExit:
             subscriptions.remove(q)
 
     return Response(gen(), mimetype="text/event-stream")
